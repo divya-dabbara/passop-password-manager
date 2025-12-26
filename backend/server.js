@@ -44,12 +44,19 @@ app.post('/', async (req, res) => {
 
 // Delete a password by id
 app.delete('/', async (req, res) => {
-  const password = req.body  
-  const db = client.db(dbName);
-  const collection = db.collection('passwords')
-  const findResult = await collection.deleteOne(password);
-  res.send({success: true, result: findResult})
-})
+  try {
+    const { id } = req.body;
+    const db = client.db(dbName);
+    const collection = db.collection('passwords');
+
+    const result = await collection.deleteOne({ id });
+    res.json({ success: true, result });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Example app listening on  http://localhost:${port}`)

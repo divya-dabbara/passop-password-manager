@@ -17,7 +17,6 @@ const Manager = () => {
   
   }
 
-
   useEffect(() => {
     getPasswords()
 
@@ -50,40 +49,77 @@ const Manager = () => {
   };
 
   const savePassword = async () => {
-    if (
-      form.site.length > 3 &&
-      form.username.length > 3 &&
-      form.password.length > 3
-    ) {
+  if (
+    form.site.length > 3 &&
+    form.username.length > 3 &&
+    form.password.length > 3
+  ) {
 
-      // If any such id exists in the db, delete it
-       await fetch(`${import.meta.env.VITE_API_URL}`, { method: "DELETE", headers: { "Content-Type": "application/json"}, 
-      body: JSON.stringify({id: form.id})})
-
-      setPasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
-      await fetch(`${import.meta.env.VITE_API_URL}`, { method: "POST", headers: { "Content-Type": "application/json"}, 
-      body: JSON.stringify({...form, id: uuidv4()})})
-      // localStorage.setItem(
-      //   "passwords",
-      //   JSON.stringify([...passwordArray, { ...form, id: uuidv4() }])
-      // );
-      // console.log(passwordArray);
-      setForm({ site: "", username: "", password: "" });
-      toast("Password saved!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: "Bounce",
+    // ✅ DELETE only if id exists (editing case)
+    if (form.id) {
+      await fetch(`${import.meta.env.VITE_API_URL}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: form.id }),
       });
-    } else {
-      toast("Error: Password not saved");
     }
-  };
+
+    setPasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
+
+    await fetch(`${import.meta.env.VITE_API_URL}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...form, id: uuidv4() }),
+    });
+
+    setForm({ site: "", username: "", password: "" });
+
+    toast("Password saved!", {
+      position: "top-right",
+      autoClose: 5000,
+      theme: "light",
+      transition: "Bounce",
+    });
+  } else {
+    toast("Error: Password not saved");
+  }
+};
+
+  // const savePassword = async () => {
+  //   if (form.id &&
+  //     form.site.length > 3 &&
+  //     form.username.length > 3 &&
+  //     form.password.length > 3
+  //   ) {
+
+  //     // If any such id exists in the db, delete it
+  //      await fetch(`${import.meta.env.VITE_API_URL}`, { method: "DELETE", headers: { "Content-Type": "application/json"}, 
+  //     body: JSON.stringify({id: form.id})})
+
+  //     setPasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
+  //     await fetch(`${import.meta.env.VITE_API_URL}`, { method: "POST", headers: { "Content-Type": "application/json"}, 
+  //     body: JSON.stringify({...form, id: uuidv4()})})
+  //     // localStorage.setItem(
+  //     //   "passwords",
+  //     //   JSON.stringify([...passwordArray, { ...form, id: uuidv4() }])
+  //     // );
+  //     // console.log(passwordArray);
+  //     setForm({ site: "", username: "", password: "" });
+  //     toast("Password saved!", {
+  //       position: "top-right",
+  //       autoClose: 5000,
+  //       hideProgressBar: false,
+  //       closeOnClick: false,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //       theme: "light",
+  //       transition: "Bounce",
+  //     });
+  //   } else {
+  //     toast("Error: Password not saved");
+  //   }
+  // };
 
   const deletePassword = async (id) => {
     console.log("Deleting password with id", id);
